@@ -96,17 +96,8 @@
         />
       </div>
       <!-- Change Color -->
-      <h3>Inset: {{ inset ? 'inset' : '' }}</h3>
-      <button
-        class="show-color-picker"
-        @click="inset = !inset"
-        :style="{
-          background: inset ? boxColor : '#c63b3b',
-          color: inset ? '#000' : '#fff',
-        }"
-      >
-        {{ inset ? 'INSET ON' : 'INSET OFF' }}
-      </button>
+      <h3>Inset: {{ inset ? 'on' : 'off' }}</h3>
+      <Toggle :toggle="inset" @update="inset = $event"></Toggle>
     </div>
 
     <!-- The Box -->
@@ -121,7 +112,7 @@
     >
       {{
         `box-shadow: ${horizontal}px ${vertical}px ${5}px ${0}px ${color} ${
-          inset ? inset : ''
+          inset ? 'inset' : ''
         }`
       }}
     </div>
@@ -133,12 +124,14 @@ import Slider from '@vueform/slider';
 import { ColorPicker } from 'vue-color-kit';
 import 'vue-color-kit/dist/vue-color-kit.css';
 import '@vueform/slider/themes/default.css';
+import Toggle from './Toggle.vue';
 
 export default {
   name: 'Boxxy',
   components: {
     Slider,
     ColorPicker,
+    Toggle,
   },
   data() {
     return {
@@ -161,22 +154,19 @@ export default {
   watch: {
     opacity(value) {
       const rm = this.color
-        .replace('rgba(', '')
-        .replace(')', '')
-        .replace(' ', '')
-        .split(',');
-      this.color = `rgba(${Number(rm[0])}, ${Number(rm[1])}, ${Number(
-        rm[2]
-      )}, ${value})`;
+        .replace(/\brgba\(|\)|,\b/gi, '')
+        .split(',')
+        .map((x) => Number(x.trim()));
+      this.color = `rgba(${rm[0]}, ${rm[1]}, ${rm[2]}, ${value})`;
     },
   },
   methods: {
-    slideMin(name) {
-      return name === 'opacity' ? 0.05 : this.min;
-    },
-    slideMax() {
-      return name === 'opacity' ? 0.99 : this.max;
-    },
+    // slideMin(name) {
+    //   return name === 'opacity' ? 0.05 : this.min;
+    // },
+    // slideMax() {
+    //   return name === 'opacity' ? 0.99 : this.max;
+    // },
     changeColor(color) {
       const { r, g, b, a } = color.rgba;
       this.color = `rgba(${r}, ${g}, ${b}, ${a})`;
